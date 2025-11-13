@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locería Sanches - Tienda Virtual</title>
+    <style>
+        /* ----------------- RESET ----------------- */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI', Tahoma, sans-serif; background:#F5F5F5; color:#333; }
+        a { text-decoration:none; color:inherit; }
+        ul { list-style:none; }
+        img { display:block; max-width:100%; }
+
+        /* ------------- CONTENEDOR ------------- */
+        .container { max-width:1200px; margin:auto; padding:0 1rem; }
+
+        /* -------------- HEADER -------------- */
+        header { background:#E53935; color:#fff; position:sticky; top:0; z-index:100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        header .container { display:flex; align-items:center; justify-content:space-between; padding:1rem; }
+        header .logo { display:flex; align-items:center; gap: 0.75rem;}
+        header .logo img { height:50px; border-radius:50%; background:white; padding:2px;}
+        header h1 { margin-left: 0.5rem; } /* Añadido un pequeño margen para separación */
+        header nav ul { display:flex; gap:1rem; }
+        header nav a { font-weight:bold; padding:0.5rem; transition: background 0.3s; }
+        header nav a:hover { background:rgba(255,255,255,0.2); border-radius:4px; }
+        #search { padding:0.5rem; border:none; border-radius:4px; width:200px; }
+        #cart-icon { position:relative; cursor:pointer; margin-left: 1rem; } /* Añadido margen para separación */
+        #cart-count { position:absolute; top:-5px; right:-10px; background:#fff; color:#E53935; border-radius:50%; padding:2px 6px; font-size:0.8rem; font-weight: bold;}
+        .mobile-menu { display:none; cursor:pointer; }
+        .mobile-menu span { display:block; width:25px; height:3px; background:#fff; margin:4px 0; }
+
+        @media(max-width:768px){
+            header nav ul { display:none; }
+            .mobile-menu { display:block; }
+            header .container { flex-wrap:wrap; gap:1rem; }
+        }
+
+        /* --------------- HERO ---------------- */
+        #hero {
+            position:relative;
+            overflow:hidden;
+            height:350px;
+            background: #f8f9fa;
+        }
+        .slide {
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background-size:cover;
+            background-position:center;
+            opacity:0;
+            transition:opacity 0.7s ease-in-out;
+        }
+        .slide.active { opacity:1; }
+        .slide-content { position:absolute; bottom:20px; left:20px; background:rgba(0,0,0,0.6); color:#fff; padding:2rem; border-radius:8px; max-width:40%; }
+        .slider-nav { position:absolute; top:50%; width:100%; display:flex; justify-content:space-between; transform:translateY(-50%); padding:0 1rem; }
+        .slider-nav span { background:rgba(0,0,0,0.5); color:#fff; padding:.75rem; cursor:pointer; border-radius:50%; user-select: none; }
+        .slider-nav span:hover { background:rgba(0,0,0,0.8); }
+
+        /* -------------- MARCAS ------------- */
+        #brands { padding:2rem 0; }
+        #brands h2 { text-align:center; margin-bottom:1.5rem; }
+        .brands-slider { display:flex; overflow-x:auto; gap:1.5rem; padding:1rem; align-items:center; }
+        .brand { flex:0 0 auto; width:150px; height:80px; display:flex; align-items:center; justify-content:center; background:#fff; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); padding: 0.5rem;}
+        .brand img { max-height:70px; max-width:140px; object-fit:contain; }
+
+        /* ------------- NOVEDADES ------------ */
+        #novedades { padding:2rem 0; background:#fff; }
+        #novedades h2 { text-align:center; margin-bottom:1.5rem; }
+        .nov-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.5rem; padding:0 1rem; }
+        .nov-item { position:relative; background:#F5F5F5; border-radius:8px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+        .nov-item img { width:100%; height:200px; object-fit:cover; }
+        .label-nuevo { position:absolute; top:10px; left:10px; background:#E53935; color:#fff; padding:.25rem .5rem; font-size:.8rem; border-radius:4px; font-weight: bold;}
+        .nov-info { padding:1rem; text-align:center; font-weight: 500;}
+        .nov-info p { font-weight: bold; color: #E53935; }
+
+        /* ----------- CATÁLOGO Y CARRITO ----------- */
+        main { display:flex; flex-wrap:wrap; gap:2rem; padding:2rem 1rem; }
+        #catalogo { flex:3; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.5rem; }
+        .producto { background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 4px rgba(0,0,0,0.1); display:flex; flex-direction:column; transition:transform .3s, box-shadow .3s; }
+        .producto:hover { transform:translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .producto img {
+            width:100%;
+            height:180px;
+            object-fit:cover;
+            border-bottom: 1px solid #eee;
+            transition: transform 0.3s ease; /* Agregado para una transición suave del zoom */
+        }
+        .producto img:hover {
+            transform: scale(1.1); /* Hace la imagen un 10% más grande al pasar el puntero */
+        }
+        .producto-info { padding:1rem; flex:1; display:flex; flex-direction:column; }
+        .producto-info h3 { font-size: 1.05rem; margin-bottom:.5rem; }
+        .producto-info .precio { font-weight:bold; color:#E53935; font-size:1.2rem; margin-bottom:0.5rem; }
+        .producto-info .stock { font-size:0.9rem; color:#555; margin-bottom:1rem; } /* Estilo para el stock */
+        .producto-info .stock.agotado { color: #c62828; font-weight: bold;} /* Estilo para stock agotado */
+        .producto-info .categoria { flex:1; margin-bottom:1rem; color: #666; font-size:0.9rem;}
+        .producto-info button { background:#E53935; color:#fff; border:none; padding:.75rem; border-radius:4px; cursor:pointer; transition:background .3s; width:100%; font-weight: bold;}
+        .producto-info button:hover { background:#B71C1C; }
+        .producto-info button:disabled { background:#ccc; cursor:not-allowed; } /* Estilo para botón deshabilitado */
+
+        aside#carrito { flex:1; min-width: 280px; background:#fff; border-radius:8px; padding:1.5rem; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:sticky; top:110px; max-height:calc(100vh - 130px); overflow-y:auto; }
+        #carrito h2 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        #carrito h2 svg {
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        #carrito .pedido-info {
+            margin-top: 1.5rem;
+            border-top: 1px solid #ddd;
+            padding-top: 1.5rem;
+        }
+
+        #carrito .envio-ejemplo {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #388e3c;
+        }
+
+        #carrito .envio-texto {
+            font-size: 0.9rem;
+        }
+
+        #carrito h3 {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        #carrito label {
+            display: block;
+            margin-bottom: .25rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        #carrito input, #carrito button {
+            width: 100%;
+            padding: .75rem;
+            margin-bottom: .75rem; /* Aumenté el margen inferior */
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        #carrito input:focus {
+            outline: none;
+            border-color: #E53935;
+            box-shadow: 0 0 5px rgba(229, 57, 53, 0.5);
+        }
+
+        #carrito button {
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background .3s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #carrito button svg {
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        #carrito button:hover {
+            background: #1b5e20;
+        }
+        .item { display:flex; justify-content:space-between; align-items:center; margin-bottom:.75rem; border-bottom: 1px solid #eee; padding-bottom: 0.75rem; font-size: 0.95rem; }
+        .item span { flex:1; padding-right: 1rem;}
+        .item button { background:#c62828; color:#fff; border:none; padding:.25rem .5rem; cursor:pointer; border-radius:4px; margin-left: 1rem;}
+        #total { text-align:right; font-weight:bold; font-size: 1.2rem; margin-top:1.5rem; }
+
+        /* ------- CATEGORÍAS DESTACADAS ------- */
+        #categorias { padding:2rem 0; }
+        #categorias h2 { text-align:center; margin-bottom:2rem; }
+        .categorias-container { display:flex; justify-content:center; flex-wrap:wrap; gap:2rem; }
+        .categoria { text-align:center; width:120px; cursor:pointer; }
+        .categoria div { width:90px; height:90px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.1); margin:0 auto .75rem; display:flex; align-items:center; justify-content:center; font-size: 2.5rem; transition: transform 0.3s; }
+        .categoria:hover div { transform: scale(1.1); }
+        .categoria span { font-weight:bold; }
+
+        /* -------- BENEFICIOS -------- */
+        #beneficios { padding:2rem 0; background:#fff; }
+        .beneficios-container { display:flex; justify-content:space-around; flex-wrap:wrap; gap:2rem; max-width: 800px; margin: auto; }
+        .beneficio { text-align:center; width:200px; padding:1rem; }
+        .beneficio div { font-size: 3rem; margin-bottom: 0.5rem; color: #E53935;}
+        .beneficio h3 { margin-bottom:.5rem; }
+        .beneficio p { font-size:.9rem; color: #555; }
+
+        /* ------- CONTACTO Y MAPA ------- */
+        #contacto { padding:2rem 1rem; text-align:center; }
+        #mapa { width:100%; height:350px; border:none; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin-top: 1.5rem;}
+
+        /* -------- FOOTER -------- */
+        footer { background:#333; color:#fff; padding:3rem 1rem; }
+        .footer-container { display:flex; justify-content:space-between; flex-wrap:wrap; max-width:1200px; margin:auto; gap: 2rem;}
+        .footer-section { flex:1 1 220px; }
+        .footer-section h4 { margin-bottom:1rem; color: #E53935; }
+        .footer-section ul li { margin-bottom:.5rem; }
+        .footer-section ul a:hover { color: #E53935; }
+        .footer-redes { display:flex; gap:1rem; flex-wrap:wrap; }
+        .footer-redes a { color: white; display: inline-block; padding: 0.5rem 1rem; border-radius: 4px; font-weight: 500; transition:transform .3s; }
+        .footer-redes a:hover { transform:scale(1.1); }
+        .fb { background:#1877F2; }
+        .ig { background-image: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);}
+        .wa { background:#25D366; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="images/potter_realistic.png" alt="Logo Locería Sanches">
+                <h1>Locería Sanches</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="#catalogo">Productos</a></li>
+                    <li><a href="#novedades">Novedades</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <input type="text" id="search" placeholder="Buscar productos...">
+            <div id="cart-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                    <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+                <span id="cart-count">0</span>
+            </div>
+            <div class="mobile-menu" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <section id="hero">
+        <div class="slide active" style="background-image: url('images/productos.png');"></div>
+
+        <div class="slide" style="background-image: url('images/vajillas.png');">
+            <div class="slide-content">
+                <h2>Nueva Colección Vida</h2>
+                <p>Descubre la armonía en tu mesa con nuestros diseños exclusivos.</p>
+                <button onclick="scrollToSection('catalogo')">Ver más</button>
+            </div>
+        </div>
+
+        <div class="slide" style="background-image: url('images/productos.png');">
+            <div class="slide-content">
+                <h2>Envíos a nivel nacional</h2>
+                <p>Recibe tus productos donde quieras</p>
+            </div>
+        </div>
+
+        <div class="slider-nav">
+            <span onclick="prevSlide()">❮</span>
+            <span onclick="nextSlide()">❯</span>
+        </div>
+    </section>
+
+    <section id="brands" class="container">
+        <h2>Nuestras Marcas</h2>
+        <div class="brands-slider">
+                <div class="brand"><img src="images/marca 1.png" alt="Duralex"></div>
+                <div class="brand"><img src="images/marca 2.png" alt="Polimes"></div>
+                <div class="brand"><img src="images/marca 3.png" alt="LAV"></div>
+                <div class="brand"><img src="images/marca 4.png" alt="Pasabahce"></div>
+                <div class="brand"><img src="images/marca 5.png" alt="Marca Sanches"></div>
+                <div class="brand"><img src="images/marca 6 .png" alt="Nadir"></div>
+        </div>
+    </section>
+
+    <section id="novedades" class="container">
+        <h2>Novedades</h2>
+        <div class="nov-container">
+            <div class="nov-item">
+                <img src="images/olla Banbuada.png" alt="Olla Banbuada">
+                <div class="label-nuevo">Nuevo</div>
+                <div class="nov-info"><h4>Olla Banbuada</h4><p>$18.00</p></div>
+            </div>
+            <div class="nov-item">
+                <img src="images/olla de acero.png" alt="Olla de Acero">
+                <div class="label-nuevo">Nuevo</div>
+                <div class="nov-info"><h4>Olla de Acero</h4><p>$35.00</p></div>
+            </div>
+            <div class="nov-item">
+                <img src="images/platos.png" alt="Set de Platos de Loza">
+                <div class="label-nuevo">Nuevo</div>
+                <div class="nov-info"><h4>Set de Platos de Loza</h4><p>$22.00</p></div>
+            </div>
+            <div class="nov-item">
+                <img src="images/jarron.png" alt="Jarrón de Vidrio Labrado">
+                <div class="label-nuevo">Nuevo</div>
+                <div class="nov-info"><h4>Jarrón de Vidrio Labrado</h4><p>$15.00</p></div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <section id="catalogo"></section>
+        <aside id="carrito">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#E53935" style="margin-right: 0.5rem; vertical-align: middle;">
+                    <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+                Tu Carrito
+            </h2>
+            <div id="items"></div>
+            <div id="total">Total: $0.00</div>
+
+            <div class="pedido-info">
+                <div class="envio-ejemplo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="#388e3c" style="margin-bottom: 0.5rem;">
+                        <path d="M20 8h-3V4H7v4H4l-3 3v9h20v-9l-3-3zm-9 10H9v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8-6h6v4h-6v-4z"/>
+                    </svg>
+                    <p class="envio-texto">¡Tu pedido está listo para ser enviado desde Cajamarca!</p>
+                </div>
+
+                <div id="pedido">
+                    <h3>Realizar Pedido</h3>
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" placeholder="Tu nombre">
+                    <label for="direccion">Dirección de envío</label>
+                    <input type="text" id="direccion" placeholder="Tu dirección">
+                    <button id="btn-pedir">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white" style="margin-right: 0.5rem; vertical-align: middle;">
+                            <path d="M17.2 5.4c-1.2-1.2-3.1-1.2-4.2 0l-7 7c-.4.4-.7.9-.8 1.4l-2 7c-.1.4.1.8.4 1s.8.1 1-.1l7-2c.5-.1 1-.4 1.4-.8l7-7c1.2-1.2 1.2-3.1 0-4.2zm-2 2.8L7.4 13.6c-.2.2-.5.3-.7.1l-2.2-.6 6.8-1.9c.2-.1.4-.3.5-.5l6.2-6.2c.8-.8.8-2 0-2.8-1.2-1.2-3.1-1.2-4.2 0zM15.8 7c-.4.4-.4 1 0 1.4.4.4 1 .4 1.4 0 .4-.4.4-1 0-1.4z"/>
+                        </svg>
+                        Enviar Pedido por WhatsApp
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <section id="categorias" class="container">
+        <h2>Categorías Destacadas</h2>
+        <div class="categorias-container">
+            <div class="categoria">
+                <div>🍳</div>
+                <span>Ollas y Sartenes</span>
+            </div>
+            <div class="categoria">
+                <div>🥤</div>
+                <span>Vasos y Jarras</span>
+            </div>
+            <div class="categoria">
+                <div>🍽️</div>
+                <span>Platos y Vajillas</span>
+            </div>
+            <div class="categoria">
+                <div>🍴</div>
+                <span>Cubiertos</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="beneficios" class="container">
+        <div class="beneficios-container">
+            <div class="beneficio">
+                <div>🚚</div>
+                <h3>Envíos a Nivel Nacional</h3>
+                <p>Recibe tu pedido en 48h en la puerta de tu casa.</p>
+            </div>
+            <div class="beneficio">
+                <div>💳</div>
+                <h3>Pagos Seguros</h3>
+                <p>Aceptamos todos los medios de pago.</p>
+            </div>
+            <div class="beneficio">
+                <div>📱</div>
+                <h3>Atención Personalizada</h3>
+                <p>Contáctanos por WhatsApp para cualquier consulta.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="container">
+        <h2>Encuéntranos</h2>
+        <p>📍 Dirección: Jr. Dos de Mayo 432, Cajamarca, Perú</p>
+        <p>📞 Teléfono: +51 999 888 777</p>
+        <p>📧 Email: info@loceriasanches.com</p>
+        <iframe id="mapa" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.902649982369!2d-78.51733298522735!3d-7.16104279493922!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91b25b1875141c7b%3A0x633a953979897a8e!2sCajamarca!5e0!3m2!1ses!2spe!4v1623805494831!5m2!1ses!2spe" allowfullscreen="" loading="lazy"></iframe>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Locería Sanches</h4>
+                <p>Tu tienda de confianza para loza y utensilios de cocina desde 2020. Calidad y tradición para tu hogar.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="#catalogo">Productos</a></li>
+                    <li><a href="#novedades">Novedades</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Síguenos</h4>
+                <div class="footer-redes">
+                    <a href="#" class="fb">Facebook</a>
+                    <a href="#" class="ig">Instagram</a>
+                    <a href="#" class="wa">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- LISTA DE PRODUCTOS ---
+        const productos = [
+            {id: 1, nombre: 'Chicharonera Amore', precio: 28.00, categoria: 'Ollas', imagen: 'images/chicharoneria.png', stock: 10},
+            {id: 2, nombre: 'Copa Sodera de Vidrio', precio: 3.50, categoria: 'Vasos', imagen: 'images/copa sodera.png', stock: 50},
+            {id: 3, nombre: 'Jarrón de Vidrio Labrado', precio: 15.00, categoria: 'Jarras', imagen: 'images/jarron.png', stock: 5},
+            {id: 4, nombre: 'Olla Banbuada Antiadherente', precio: 18.00, categoria: 'Ollas', imagen: 'images/olla Banbuada.png', stock: 0}, // Ejemplo: stock agotado
+            {id: 5, nombre: 'Juego de Ollas de Acero', precio: 35.00, categoria: 'Ollas', imagen: 'images/olla de acero.png', stock: 12},
+            {id: 6, nombre: 'Set de Platos de Loza', precio: 22.00, categoria: 'Platos', imagen: 'images/platos.png', stock: 20},
+            {id: 7, nombre: 'Juego de Cubiertos', precio: 8.00, categoria: 'Cubiertos', imagen: 'images/juego de cubiertos.png', stock: 30},
+            {id: 8, nombre: 'Vajilla Completa', precio: 45.00, categoria: 'Vajillas', imagen: 'images/vajillas.png', stock: 7},
+            {id: 9, nombre: 'Vaso Mikonos', precio: 4.50, categoria: 'Vasos', imagen: 'images/vaso mikonos .png', stock: 25}
+        ];
+
+        let carrito = [];
+        let slideIndex = 0;
+        let slideInterval;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarProductos();
+            startSlideshow();
+            document.getElementById('btn-pedir').addEventListener('click', enviarPedido);
+        });
+
+        function renderizarProductos() {
+            const catalogo = document.getElementById('catalogo');
+            const productosParaCatalogo = productos.filter(producto => producto.categoria !== 'Marca');
+
+            catalogo.innerHTML = productosParaCatalogo.map(producto => `
+            <div class="producto">
+                <img src="${producto.imagen}" alt="${producto.nombre}">
+                <div class="producto-info">
+                    <h3>${producto.nombre}</h3>
+                    <p class="categoria">Categoría: ${producto.categoria}</p>
+                    <p class="precio">$${producto.precio.toFixed(2)}</p>
+                    <p class="stock ${producto.stock === 0 ? 'agotado' : ''}">Stock: ${producto.stock > 0 ? producto.stock : 'Agotado'}</p>
+                    <button ${producto.stock === 0 ? 'disabled' : ''} onclick="agregarAlCarrito(${producto.id})">Agregar al Carrito</button>
+                </div>
+            </div>
+            `).join('');
+        }
+
+        function agregarAlCarrito(id) {
+            const producto = productos.find(p => p.id === id);
+
+            if (producto.stock === 0) {
+                alert('Este producto está agotado.');
+                return;
+            }
+
+            const itemExistente = carrito.find(item => item.id === id);
+            if (itemExistente) {
+                if (itemExistente.cantidad < producto.stock) {
+                    itemExistente.cantidad++;
+                } else {
+                    alert(`No hay más stock disponible de ${producto.nombre}.`);
+                    return;
+                }
+            } else {
+                carrito.push({ ...producto, cantidad: 1 });
+            }
+            renderizarCarrito();
+        }
+
+        function eliminarDelCarrito(id) {
+            carrito = carrito.filter(item => item.id !== id);
+            renderizarCarrito();
+        }
+
+        function renderizarCarrito() {
+            const itemsContainer = document.getElementById('items');
+            const totalContainer = document.getElementById('total');
+            const cartCount = document.getElementById('cart-count');
+
+            itemsContainer.innerHTML = carrito.map(item => `
+            <div class="item">
+                <span>${item.nombre} (x${item.cantidad})</span>
+                <strong>$${(item.precio * item.cantidad).toFixed(2)}</strong>
+                <button onclick="eliminarDelCarrito(${item.id})">X</button>
+            </div>
+            `).join('');
+
+            const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+            totalContainer.textContent = `Total: $${total.toFixed(2)}`;
+            cartCount.textContent = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+        }
+
+        function enviarPedido() {
+            if (carrito.length === 0) {
+                alert("Tu carrito está vacío.");
+                return;
+            }
+
+            const nombre = document.getElementById('nombre').value;
+            const direccion = document.getElementById('direccion').value;
+
+            if (!nombre || !direccion) {
+                alert("Por favor, completa tu nombre y dirección.");
+                return;
+            }
+
+            let mensaje = `¡Hola Locería Sanches! 👋\n\nQuisiera hacer el siguiente pedido:\n`;
+            mensaje += `-----------------------------------\n`;
+            carrito.forEach(item => {
+                mensaje += `🔹 ${item.nombre} (x${item.cantidad}) - $${(item.precio * item.cantidad).toFixed(2)}\n`;
+            });
+            const total = carrito.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+            mensaje += `-----------------------------------\n`;
+            mensaje += `*TOTAL: $${total.toFixed(2)}*\n\n`;
+            mensaje += `*Datos de Envío:*\n`;
+            mensaje += `👤 *Nombre:* ${nombre}\n`;
+            mensaje += `🚚 *Dirección:* ${direccion}\n\n`;
+            mensaje += `¡Gracias! Quedo a la espera de la confirmación.`;
+
+            const telefono = '51999888777';
+            const url = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        }
+
+        function showSlides() {
+            let slides = document.querySelectorAll('.slide');
+            if (!slides.length) return;
+
+            slides[slideIndex].classList.remove('active');
+            slideIndex = (slideIndex + 1) % slides.length;
+            slides[slideIndex].classList.add('active');
+        }
+
+        function startSlideshow() {
+            let slides = document.querySelectorAll('.slide');
+            if (slides.length > 0) {
+                slides[slideIndex].classList.add('active');
+            }
+            slideInterval = setInterval(showSlides, 4000);
+        }
+
+        function nextSlide() {
+            clearInterval(slideInterval);
+            showSlides();
+            slideInterval = setInterval(showSlides, 4000);
+        }
+
+        function prevSlide() {
+            clearInterval(slideInterval);
+            let slides = document.querySelectorAll('.slide');
+            if (!slides.length) return;
+            slides[slideIndex].classList.remove('active');
+            slideIndex = (slideIndex - 1 + slides.length) % slides.length;
+            slides[slideIndex].classList.add('active');
+            slideInterval = setInterval(showSlides, 4000);
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleMenu() {
+            const navUl = document.querySelector('header nav ul');
+            if (navUl) {
+                if (navUl.style.display === 'flex') {
+                    navUl.style.display = 'none';
+                } else {
+                    navUl.style.display = 'flex';
+                    navUl.style.flexDirection = 'column';
+                    navUl.style.position = 'absolute';
+                    navUl.style.top = '70px';
+                    navUl.style.left = '0';
+                    navUl.style.width = '100%';
+                    navUl.style.background = '#E53935';
+                    navUl.style.padding = '1rem';
+                    navUl.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
