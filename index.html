@@ -217,6 +217,116 @@
         .fb { background:#1877F2; }
         .ig { background-image: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);}
         .wa { background:#25D366; }
+
+        /* ---------- BOTÓN DE ACCESIBILIDAD ---------- */
+        .accesibilidad-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #E53935;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-size: 24px;
+        }
+
+        .accesibilidad-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .accesibilidad-panel {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            width: 250px;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .accesibilidad-panel.show {
+            display: flex;
+        }
+
+        .accesibilidad-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .accesibilidad-option:hover {
+            background-color: #f5f5f5;
+        }
+
+        .accesibilidad-option input {
+            margin: 0;
+        }
+
+        /* Estilos para las opciones de accesibilidad */
+        .high-contrast {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+
+        .high-contrast header,
+        .high-contrast footer,
+        .high-contrast .producto,
+        .high-contrast aside#carrito {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 1px solid #fff !important;
+        }
+
+        .high-contrast .producto-info button,
+        .high-contrast #carrito button {
+            background-color: #fff !important;
+            color: #000 !important;
+            border: 1px solid #fff !important;
+        }
+
+        .high-contrast .nov-item,
+        .high-contrast .beneficio {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 1px solid #fff !important;
+        }
+
+        .large-text {
+            font-size: 1.2em !important;
+        }
+
+        .large-text h1, 
+        .large-text h2, 
+        .large-text h3, 
+        .large-text h4 {
+            font-size: 1.4em !important;
+        }
+
+        .large-text .producto-info h3 {
+            font-size: 1.3em !important;
+        }
+
+        .readable-font {
+            font-family: Arial, sans-serif !important;
+        }
     </style>
 </head>
 <body>
@@ -422,6 +532,27 @@
         </div>
     </footer>
 
+    <!-- Botón de accesibilidad -->
+    <div class="accesibilidad-btn" onclick="toggleAccesibilidadPanel()">
+        ♿
+    </div>
+
+    <!-- Panel de opciones de accesibilidad -->
+    <div class="accesibilidad-panel" id="accesibilidadPanel">
+        <div class="accesibilidad-option">
+            <input type="checkbox" id="altoContraste" onchange="toggleAltoContraste()">
+            <label for="altoContraste">Alto contraste</label>
+        </div>
+        <div class="accesibilidad-option">
+            <input type="checkbox" id="textoGrande" onchange="toggleTextoGrande()">
+            <label for="textoGrande">Texto grande</label>
+        </div>
+        <div class="accesibilidad-option">
+            <input type="checkbox" id="fuenteLegible" onchange="toggleFuenteLegible()">
+            <label for="fuenteLegible">Fuente legible</label>
+        </div>
+    </div>
+
     <script>
         // --- LISTA DE PRODUCTOS ---
         const productos = [
@@ -596,6 +727,34 @@
                 }
             }
         }
+
+        // Funciones para accesibilidad
+        function toggleAccesibilidadPanel() {
+            const panel = document.getElementById('accesibilidadPanel');
+            panel.classList.toggle('show');
+        }
+
+        function toggleAltoContraste() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function toggleTextoGrande() {
+            document.body.classList.toggle('large-text');
+        }
+
+        function toggleFuenteLegible() {
+            document.body.classList.toggle('readable-font');
+        }
+
+        // Cerrar el panel de accesibilidad al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('accesibilidadPanel');
+            const btn = document.querySelector('.accesibilidad-btn');
+            
+            if (!panel.contains(event.target) && !btn.contains(event.target)) {
+                panel.classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
