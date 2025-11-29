@@ -218,66 +218,111 @@
         .ig { background-image: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);}
         .wa { background:#25D366; }
 
-        /* ---------- BOTÓN DE ACCESIBILIDAD ---------- */
-        .accesibilidad-btn {
+        /* ---------- BOTÓN DE ACCESIBILIDAD USERWAY ---------- */
+        .userway-btn {
             position: fixed;
             bottom: 20px;
             right: 20px;
             width: 60px;
             height: 60px;
-            background-color: #E53935;
+            background-color: #0055a5;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             transition: all 0.3s ease;
             font-size: 24px;
+            font-weight: bold;
         }
 
-        .accesibilidad-btn:hover {
+        .userway-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
         }
 
-        .accesibilidad-panel {
+        .userway-panel {
             position: fixed;
             bottom: 90px;
             right: 20px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            width: 250px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 320px;
             z-index: 1000;
             display: none;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            font-family: Arial, sans-serif;
         }
 
-        .accesibilidad-panel.show {
+        .userway-panel.show {
             display: flex;
         }
 
-        .accesibilidad-option {
+        .userway-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .userway-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .userway-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .userway-option {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-radius: 4px;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.2s;
+            font-size: 15px;
         }
 
-        .accesibilidad-option:hover {
+        .userway-option:hover {
             background-color: #f5f5f5;
         }
 
-        .accesibilidad-option input {
-            margin: 0;
+        .userway-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .userway-footer {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .userway-footer a {
+            color: #0055a5;
+            text-decoration: underline;
         }
 
         /* Estilos para las opciones de accesibilidad */
@@ -326,6 +371,33 @@
 
         .readable-font {
             font-family: Arial, sans-serif !important;
+        }
+
+        .highlight-links a {
+            background-color: yellow !important;
+            color: #000 !important;
+            padding: 2px 4px !important;
+            border-radius: 3px !important;
+        }
+
+        .text-spacing {
+            letter-spacing: 0.12em !important;
+            word-spacing: 0.16em !important;
+            line-height: 1.8 !important;
+        }
+
+        .no-animations * {
+            animation: none !important;
+            transition: none !important;
+        }
+
+        .hide-images img {
+            display: none !important;
+        }
+        
+        .hide-images .slide {
+            background-image: none !important;
+            background-color: #f0f0f0 !important;
         }
     </style>
 </head>
@@ -532,24 +604,51 @@
         </div>
     </footer>
 
-    <!-- Botón de accesibilidad -->
-    <div class="accesibilidad-btn" onclick="toggleAccesibilidadPanel()">
+    <!-- Botón de accesibilidad estilo UserWay -->
+    <div class="userway-btn" onclick="toggleUserWayPanel()">
         ♿
     </div>
 
-    <!-- Panel de opciones de accesibilidad -->
-    <div class="accesibilidad-panel" id="accesibilidadPanel">
-        <div class="accesibilidad-option">
-            <input type="checkbox" id="altoContraste" onchange="toggleAltoContraste()">
-            <label for="altoContraste">Alto contraste</label>
+    <!-- Panel de opciones de accesibilidad estilo UserWay -->
+    <div class="userway-panel" id="userWayPanel">
+        <div class="userway-header">
+            <div class="userway-title">Menú de Accesibilidad (CTRL+U)</div>
+            <button class="userway-close" onclick="toggleUserWayPanel()">×</button>
         </div>
-        <div class="accesibilidad-option">
-            <input type="checkbox" id="textoGrande" onchange="toggleTextoGrande()">
-            <label for="textoGrande">Texto grande</label>
+        
+        <div class="userway-option" onclick="toggleContrast()">
+            <div class="userway-icon">◐</div>
+            <div>Contraste +</div>
         </div>
-        <div class="accesibilidad-option">
-            <input type="checkbox" id="fuenteLegible" onchange="toggleFuenteLegible()">
-            <label for="fuenteLegible">Fuente legible</label>
+        
+        <div class="userway-option" onclick="toggleHighlightLinks()">
+            <div class="userway-icon">🔗</div>
+            <div>Resaltar enlaces</div>
+        </div>
+        
+        <div class="userway-option" onclick="toggleLargeText()">
+            <div class="userway-icon">A+</div>
+            <div>Agrandar texto</div>
+        </div>
+        
+        <div class="userway-option" onclick="toggleTextSpacing()">
+            <div class="userway-icon">↔</div>
+            <div>Espaciado de texto</div>
+        </div>
+        
+        <div class="userway-option" onclick="toggleAnimations()">
+            <div class="userway-icon">⏸️</div>
+            <div>Detener animaciones</div>
+        </div>
+        
+        <div class="userway-option" onclick="toggleHideImages()">
+            <div class="userway-icon">🖼️</div>
+            <div>Ocultar imágenes</div>
+        </div>
+        
+        <div class="userway-footer">
+            Cómo funciona UserWay | Widget de gran tamaño | 
+            <a href="#" onclick="resetAccessibility()">Restablecer</a>
         </div>
     </div>
 
@@ -575,6 +674,14 @@
             renderizarProductos();
             startSlideshow();
             document.getElementById('btn-pedir').addEventListener('click', enviarPedido);
+            
+            // Atajo de teclado CTRL+U para abrir el panel de accesibilidad
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'u') {
+                    e.preventDefault();
+                    toggleUserWayPanel();
+                }
+            });
         });
 
         function renderizarProductos() {
@@ -728,28 +835,57 @@
             }
         }
 
-        // Funciones para accesibilidad
-        function toggleAccesibilidadPanel() {
-            const panel = document.getElementById('accesibilidadPanel');
+        // Funciones para accesibilidad estilo UserWay
+        function toggleUserWayPanel() {
+            const panel = document.getElementById('userWayPanel');
             panel.classList.toggle('show');
         }
 
-        function toggleAltoContraste() {
+        function toggleContrast() {
             document.body.classList.toggle('high-contrast');
         }
 
-        function toggleTextoGrande() {
+        function toggleHighlightLinks() {
+            document.body.classList.toggle('highlight-links');
+        }
+
+        function toggleLargeText() {
             document.body.classList.toggle('large-text');
         }
 
-        function toggleFuenteLegible() {
-            document.body.classList.toggle('readable-font');
+        function toggleTextSpacing() {
+            document.body.classList.toggle('text-spacing');
+        }
+
+        function toggleAnimations() {
+            document.body.classList.toggle('no-animations');
+            if (document.body.classList.contains('no-animations')) {
+                clearInterval(slideInterval);
+            } else {
+                startSlideshow();
+            }
+        }
+
+        function toggleHideImages() {
+            document.body.classList.toggle('hide-images');
+        }
+
+        function resetAccessibility() {
+            document.body.classList.remove(
+                'high-contrast', 
+                'highlight-links', 
+                'large-text', 
+                'text-spacing', 
+                'no-animations', 
+                'hide-images'
+            );
+            startSlideshow();
         }
 
         // Cerrar el panel de accesibilidad al hacer clic fuera de él
         document.addEventListener('click', function(event) {
-            const panel = document.getElementById('accesibilidadPanel');
-            const btn = document.querySelector('.accesibilidad-btn');
+            const panel = document.getElementById('userWayPanel');
+            const btn = document.querySelector('.userway-btn');
             
             if (!panel.contains(event.target) && !btn.contains(event.target)) {
                 panel.classList.remove('show');
